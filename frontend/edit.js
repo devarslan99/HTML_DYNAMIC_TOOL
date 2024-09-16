@@ -1,3 +1,4 @@
+import { BASE_URL } from "./config.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server and populate dropdown
