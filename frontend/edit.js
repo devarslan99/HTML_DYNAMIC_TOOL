@@ -1,7 +1,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server and populate dropdown
-    fetch('http://localhost:3000/api/data')
+    fetch(`${BASE_URL}/api/data`)
         .then(response => response.json())
         .then(data => {
             const dropdown = document.getElementById('questionDropdown');
@@ -44,7 +44,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
         };
 
         // Send updated data to the backend
-        fetch('http://localhost:3000/update-data', {
+        fetch(`${BASE_URL}/update-data`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ document.getElementById('add-question-form').addEventListener('submit', function
     };
 
     // Send the new question data to the backend
-    fetch('http://localhost:3000/add-question', {
+    fetch(`${BASE_URL}/add-question`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

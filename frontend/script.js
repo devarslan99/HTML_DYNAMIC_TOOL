@@ -1,5 +1,5 @@
 import { generatePDF } from "./generatePDF.js";
-
+import { BASE_URL } from "./config.js";
 
 let query = {};
 let questions = {};
@@ -27,7 +27,7 @@ let newData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server
-    fetch('http://localhost:3000/api/data', {
+    fetch(`${BASE_URL}/api/data`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
