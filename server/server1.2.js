@@ -117,6 +117,9 @@ app.post('/add-question', async (req, res) => {
 app.get('/api/data', (req, res) => {
     res.json(newData);
 });
+app.get('/', (req, res) => {
+    res.status(200).send("Congratulation Project Is Live");
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
