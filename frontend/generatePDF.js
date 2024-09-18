@@ -12,62 +12,100 @@ function generatePDF() {
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.text("Testimonial Readiness Assessment - Physicians (TRA-P)", 20, 20);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(14);
-    doc.text("Data Output and Assessment Scores", 10, 40);
+    //   doc.setFont("helvetica", "bold");
+     doc.setFontSize(16);
+     doc.text("Data Output and Assessment Scores", 10, 40);
 
+ 
     const Identifier = document.getElementById("identifier").value;
-    doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 50);
-
-    const scoreString = document.getElementById("score").innerText;
-    let score = scoreString.split('is')[1];
-    
     // Get today's date dynamically
+   
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric"
     });
-    
-    doc.text(`Assessment Date: ${formattedDate}`, 10, 60);
-    doc.text("Your provider's overall testimonial readiness score is:", 10, 70);
+        doc.setFontSize(16);
+    doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 55);
+        doc.setFontSize(16);
+    doc.text(`Assessment Date: ${formattedDate}`, 10, 48);
+   doc.setFontSize(16); // Set the font size
+doc.setTextColor(0, 48, 143); // Set the text color
+doc.text("Testimonial Readiness Assessment Score:", 11, 67); // Add the text
+
+
+const scoreString = document.getElementById("score").innerText;
+let score = scoreString.split('is')[1];
+ const padding =30
+// Define the position and dimensions of the rounded box
+const x = 8;
+const y = 60;
+const width = 180; // Adjust width as needed
+const height = 20+padding; // Adjust height as needed
+const radius = 5; // Radius of the rounded corners
+
+
+doc.setDrawColor(0, 48, 143); // Facebook blue border
+doc.setLineWidth(0.9); // Border thickness
+
+// Draw the rounded rectangle
+doc.roundedRect(x, y, width, height, radius, radius,'D'); // Fill and draw
+
+
+// Add the text inside the rounded rectangle
+ doc.setFontSize(13);
+doc.text("Your provider's overall testimonial readiness score is:", x + 5, y + 45); // Adjust text position as needed
+
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(200, 0, 0);
-    doc.text(`${score}`, 130, 70);
-    doc.setTextColor(0, 0, 0);
-    doc.text(" out of 10", 142, 70);
+    doc.text(` ${score}`, 130, 105);
+    doc.getTextWidth(score);
+    // Draw the underline
 
-    doc.setFontSize(14);
-    doc.text("Strengths and Weaknesses:", 10, 85);
-    const textHeadingWidth = doc.getTextWidth("Strengths and Weaknesses:");
-    const startX = 10;
-    const startY = 87; // A bit below the text to simulate underlining
-    doc.setLineWidth(0.5);
-    doc.line(startX, startY, startX + textHeadingWidth, startY); // Draw underline
+doc.setTextColor(0, 0, 0);
+doc.setFontSize(25)
+doc.setTextColor(0, 45, 98)
+doc.text(" out of 10", 145, 105);
+// doc.setDrawColor(200, 0, 0); // Set the underline color (black or any color you want)
+// doc.line(130, 107,130 + scoreWidth, 107); // Draw the underline (y + 2 for offset)
+    
+    doc.setFontSize(16);
+    doc.text("Strengths and Weaknesses:", 11, 128);
 
-    // Feedback Box
+     // Feedback Box
     html2canvas(document.querySelector("#feedbackBox")).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
+      
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
-
+         const yOffset = 130;
+         
         // Calculate dimensions to fit the page width
-        const feedbackImgWidth = pageWidth - 2 * margin;
-        const feedbackImgHeight = imgHeight * (feedbackImgWidth / imgWidth); // Maintain aspect ratio
+        const feedbackImgWidth = (pageWidth - 2 * margin)*1.3;
+        const feedbackImgHeight = imgHeight * (feedbackImgWidth / imgWidth)*1.3; // Maintain aspect ratio
+// Define the position and dimensions of the rounded box to fit the image
+const padding =55
+const x = 8;
+const y = yOffset - 10; // Adjusted to be around the image
+const width = feedbackImgWidth + 2-padding; // Width of the box with extra space
+const height = feedbackImgHeight + 20; // Height of the box with extra space
+const radius = 5; // Radius of the rounded corners
 
-        doc.addImage(imgData, 'PNG', margin, 90, feedbackImgWidth, feedbackImgHeight);
 
+doc.setDrawColor(0, 48, 143); // Facebook blue border
+doc.setLineWidth(0.9); // Border thickness
+
+// Draw the rounded rectangle
+doc.roundedRect(x, y, width, height, radius, radius,'D'); // Fill and draw
+doc.addImage(imgData, 'PNG', margin, yOffset, feedbackImgWidth, feedbackImgHeight);
         // Bar Chart Section
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
-        doc.text("Sub-scale-scores (-100 to +100):", 10, 160);
+        doc.text("Sub-scale-scores (-100 to +100):", 10, 218);
         const textBarWidth = doc.getTextWidth("Sub-scale-scores (-100 to +100):");
-        const startXBar = 10;
-        const startYBar = 162;
         doc.setLineWidth(0.5);
-        doc.line(startXBar, startYBar, startXBar + textBarWidth, startYBar);
         doc.setFont("helvetica");
 
         // Capture the Bar Chart
@@ -76,7 +114,7 @@ function generatePDF() {
             const imgHeight = canvas.height;
 
             const thresholdHeight = 350; // Increased crop height
-            let yPosition = 170; // Start position for the bar chart on the first page
+            let yPosition = 220; // Start position for the bar chart on the first page
             let remainingHeight = imgHeight;
             let startCropY = 0; // Initial start point for cropping
 
@@ -112,10 +150,24 @@ function generatePDF() {
                 doc.addPage();
                 doc.setFontSize(18);
                 doc.setFont("helvetica", "bold");
+                 doc.setTextColor(0, 0, 0);
                 doc.text("Testimonial Readiness Assessment - Physicians (TRA-P)", 20, 20);
                 doc.setFontSize(14);
                 const Identifier = document.getElementById("identifier").value;
+                     doc.setTextColor(0, 0, 0);
+  doc.setFontSize(16);
         doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 40);
+        const scoreString = document.getElementById("score").innerText;
+        let score = scoreString.split('is')[1];
+     doc.setFontSize(16);
+     doc.setTextColor(0, 0, 0);
+     doc.text("Your provider's overall testimonial readiness score is:", 10, 60);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(200, 0, 0);
+    doc.text(`${score}`, 155, 60);
+    doc.setTextColor(0, 0, 0);
+    doc.text(" out of 10", 165, 60);
     // Get today's date dynamically
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-US", {
@@ -126,9 +178,9 @@ function generatePDF() {
     
     doc.text(`Assessment Date: ${formattedDate}`, 10, 50);
                 doc.setFont("helvetica", "bold");
-                doc.text("Sub-scale-continues:", 10, 60);
-                doc.setLineWidth(0.5);
-                doc.line(10, 62, 10 + doc.getTextWidth("Sub-scale-continues:"), 62);
+                doc.text("Sub-scale-continues:", 10, 68);
+                // doc.setLineWidth(0.5);
+                // doc.line(10, 62, 10 + doc.getTextWidth("Sub-scale-continues:"), 62);
 
                 yPosition = 70; // Reset Y position for the new page
 
