@@ -1,5 +1,5 @@
 import { generatePDF } from "./generatePDF.js";
-import { BASE_URL } from "./config.js";
+
 
 let query = {};
 let questions = {};
@@ -27,7 +27,7 @@ let newData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server
-    fetch(`${BASE_URL}/api/data`, {
+    fetch('http://localhost:3000/api/data', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -117,17 +117,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Set up event listeners
-        document.getElementById('submitButton').addEventListener('click', calculateScore);
+        // document.getElementById('submitButton').addEventListener('click', calculateScore);
+        
+        // document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
+           // Set up event listeners
+        document.getElementById('submitButton').addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default form submission
+            const formValid = validateForm(); // Call validation function
+
+            if (formValid) {
+                calculateScore(); // Only call calculateScore if form is valid
+            } else {
+                alert("Please provide an answer to each question."); // Show a popup
+            }
+        });
+        
         document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
     })
+    
     .catch(error => console.error('Error fetching data:', error));
 });
+function validateForm() {
+    let allAnswered = true;
+
+    // Loop through each question
+    newData.forEach((item, index) => {
+        const questionNumber = index + 1;
+        const selectedAnswer = document.querySelector(`input[name="q${questionNumber}"]:checked`);
+        
+        // If no radio button is selected for the question, mark as not answered
+        if (!selectedAnswer) {
+            allAnswered = false;
+        }
+    });
+
+    return allAnswered; // Return true if all questions are answered, otherwise false
+}
 
 function calculateScore() {
     document.getElementById("spinner").style.display = "block";
 
     setTimeout(() => {
-        let score = 5;
+        let score = 0;
         const answers = {};
 
         positiveQuestions.forEach(index => {
