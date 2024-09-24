@@ -4,9 +4,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 // Create __filename and __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -25,11 +22,11 @@ try {
 }
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = 3000;
 
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST'],
+    origin: '*', // Allows requests from all origins
+    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'], // Include DELETE method here
     allowedHeaders: ['Content-Type']
 }));
 
@@ -47,6 +44,38 @@ const saveNewDataToFile = async (updatedData) => {
         throw new Error('Error updating data');
     }
 };
+app.get("/",(req,res)=>{
+ res.json(`server is running`)
+})
+// Endpoint to delete a question
+app.delete('/delete-question/:id', async (req, res) => {
+    const questionId = parseInt(req.params.id, 10);
+    console.log(questionId)
+
+    if (isNaN(questionId)) {
+        return res.status(400).json({ success: false, message: 'Invalid question ID' });
+    }
+
+    try {
+        const questionIndex = newData.findIndex((item) => item.id === questionId);
+
+        if (questionIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Question not found' });
+        }
+
+        // Remove the question from the array
+        newData.splice(questionIndex, 1);
+
+        // Save updated data to the file
+        await saveNewDataToFile(newData);
+
+        res.json({ success: true, message: 'Question deleted successfully' });
+    } catch (err) {
+        console.error('Error processing delete question:', err);
+        res.status(500).json({ success: false, message: 'Error deleting question' });
+    }
+});
+
 
 // Endpoint to update query data
 app.post('/update-data', async (req, res) => {
@@ -116,9 +145,6 @@ app.post('/add-question', async (req, res) => {
 // Endpoint to fetch data
 app.get('/api/data', (req, res) => {
     res.json(newData);
-});
-app.get('/', (req, res) => {
-    res.status(200).send("Congratulation Project Is Live");
 });
 
 app.listen(PORT, () => {
