@@ -84,15 +84,16 @@ app.delete('/api/delete-question/:id', async (req, res) => {
 
 // Endpoint to update query data
 app.post('/api/update-data', async (req, res) => {
-    const { updatedQuestions } = req.body;
+    console.log('Request Recieved For Update Question');
+    // const { updatedQuestions } = req.body;
 
-    if (!Array.isArray(updatedQuestions) || updatedQuestions.length === 0) {
-        return res.status(400).json({ success: false, message: 'Invalid data' });
-    }
+    // if (!Array.isArray(updatedQuestions) || updatedQuestions.length === 0) {
+    //     return res.status(400).json({ success: false, message: 'Invalid data' });
+    // }
 
     try {
-        updatedQuestions.forEach((updatedQuestion) => {
-            const { id, question, phrase, isPositive } = updatedQuestion;
+        // updatedQuestions.forEach((updatedQuestion) => {
+            const { id, question, phrase, isPositive } = req.body;
             const questionIndex = newData.findIndex((item) => item.id === id);
 
             if (questionIndex !== -1) {
@@ -105,7 +106,7 @@ app.post('/api/update-data', async (req, res) => {
             } else {
                 console.warn(`Question with id ${id} not found, skipping.`);
             }
-        });
+        // });
 
         await saveNewDataToFile(newData);
         res.json({ success: true, message: 'Data updated successfully' });
