@@ -149,18 +149,26 @@ app.delete('/api/delete-question/:id', async (req, res) => {
     }
 
     try {
+        // First, delete the question with the specified questionId
         const deletedQuestion = await Question.findOneAndDelete({ id: questionId });
 
         if (!deletedQuestion) {
             return res.status(404).json({ success: false, message: 'Question not found' });
         }
 
-        res.json({ success: true, message: 'Question deleted successfully' });
+        // Then, decrement the id of all questions with id > questionId (after deletion)
+        await Question.updateMany(
+            { id: { $gt: questionId } },   // Select questions with id > deleted question's id
+            { $inc: { id: -1 } }           // Decrement their id by 1
+        );
+
+        res.json({ success: true, message: 'Question deleted and IDs updated successfully' });
     } catch (err) {
         console.error('Error deleting question:', err);
         res.status(500).json({ success: false, message: 'Error deleting question' });
     }
 });
+
 
 // Fetch all questions
 app.get('/api/data', async (req, res) => {
