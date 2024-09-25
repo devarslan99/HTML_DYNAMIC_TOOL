@@ -165,7 +165,8 @@ app.delete('/api/delete-question/:id', async (req, res) => {
 // Fetch all questions
 app.get('/api/data', async (req, res) => {
     try {
-        const questions = await Question.find({});
+        // Fetch and sort questions by 'id' in ascending order
+        const questions = await Question.find({}).sort({ id: 1 });
         res.json(questions);
     } catch (err) {
         console.error('Error fetching data:', err);
