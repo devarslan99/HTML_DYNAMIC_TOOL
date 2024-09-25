@@ -84,7 +84,7 @@ app.post('/api/add-question', async (req, res) => {
 
     try {
         // Step 1: Fetch all questions with id >= index and sort them in descending order
-        const questionsToShift = await Question.find({ id: { $gte: Number(index) } }).sort({ id: -1 });
+        const questionsToShift = await Question.find({ id: { $gte: Number(index+1) } }).sort({ id: -1 });
 
         // Step 2: Increment the ids one by one to prevent duplicate id conflict
         for (const question of questionsToShift) {
@@ -97,7 +97,7 @@ app.post('/api/add-question', async (req, res) => {
             question: newQuestion,
             phrase: newPhrase,
             isPositive,
-            id: Number(index)
+            id: Number(index+1)
         });
 
         // Step 4: Save the new question
