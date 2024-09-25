@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 mongoose.connect('mongodb+srv://saadumer5476:aaSSddFF%40123%23@html.uewjc.mongodb.net/?retryWrites=true&w=majority&appName=html').then(() => {
     console.log('Connected to MongoDB');
     // Add predefined questions after successful connection
-    addPredefinedQuestions();
+    // addPredefinedQuestions();
 }).catch((err) => {
     console.error('Error connecting to MongoDB:', err);
 });
@@ -53,7 +53,7 @@ const addPredefinedQuestions = async () => {
             const existingQuestion = await Question.findOne({ id: questionData.id });
             if (!existingQuestion) {
                 // If the question doesn't exist, add it to the database
-                console.log('Question Donot Exist');
+                console.log('Question Donot');
                 const newQuestion = new Question(questionData);
                 await newQuestion.save();
                 console.log(`Question with id ${questionData.id} added to the database.`);
@@ -68,7 +68,9 @@ const addPredefinedQuestions = async () => {
 
 // Basic health check endpoint
 app.get("/", (req, res) => {
+    addPredefinedQuestions();
     res.json(`Server is running`);
+
 });
 
 // CRUD Operations
