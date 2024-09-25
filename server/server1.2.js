@@ -77,30 +77,37 @@ app.get("/", (req, res) => {
 
 // Create a new question
 app.post('/api/add-question', async (req, res) => {
-    const { question, phrase, isPositive } = req.body;
+    const { newQuestion, newPhrase, isPositive, index } = req.body;
 
-    if (!question || !phrase || typeof isPositive === 'undefined') {
+    if (!newQuestion || !newPhrase || typeof isPositive === 'undefined' || typeof index === 'undefined') {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
     }
 
     try {
-        const lastQuestion = await Question.findOne().sort({ id: -1 });
-        const newId = lastQuestion ? lastQuestion.id + 1 : 1;
+        // First, increment the IDs of all questions that have an id >= index
+        await Question.updateMany(
+            { id: { $gte: index } },   // Find all questions with id greater than or equal to the new index
+            { $inc: { id: 1 } }        // Increment their id by 1
+        );
 
-        const newQuestion = new Question({
-            question,
-            phrase,
+        // Now create the new question with the given index (id)
+        const newQuestionObj = new Question({
+            question: newQuestion,
+            phrase: newPhrase,
             isPositive,
-            id: newId
+            id: index
         });
 
-        await newQuestion.save();
+        // Save the new question
+        await newQuestionObj.save();
+
         res.json({ success: true, message: 'Question added successfully' });
     } catch (err) {
         console.error('Error adding question:', err);
         res.status(500).json({ success: false, message: 'Error adding question' });
     }
 });
+
 
 // Update an existing question
 app.post('/api/update-data', async (req, res) => {
