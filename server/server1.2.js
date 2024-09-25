@@ -16,6 +16,7 @@ const dataFilePath = path.join(__dirname, 'newData.js');
 let newData;
 try {
     newData = (await import('./newData.js')).newData;
+    console.log('Initial data loaded:', newData); // Log loaded data
 } catch (err) {
     console.error('Error loading initial data:', err);
     process.exit(1);  // Exit the process if data cannot be loaded
@@ -25,60 +26,64 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors({
-    origin: '*', // Allows requests from all origins
-    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'], // Include DELETE method here
+    origin: '*', // Allows all origins
+    methods: ['GET', 'POST', 'DELETE', 'PUT'], // Allowed methods
     allowedHeaders: ['Content-Type']
 }));
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Helper function to save the updated newData to file
 const saveNewDataToFile = async (updatedData) => {
     const newFileContent = `const newData = ${JSON.stringify(updatedData, null, 2)};\nexport { newData };`;
+    console.log('Saving data to file:', newFileContent); // Log data being saved
 
     try {
         await fs.writeFile(dataFilePath, newFileContent, 'utf8');
+        console.log('Data saved successfully'); // Log success
     } catch (err) {
         console.error('Error writing file:', err);
         throw new Error('Error updating data');
     }
 };
-app.get("/",(req,res)=>{
- res.json(`server is running`)
-})
+
+// Basic health check endpoint
+app.get("/", (req, res) => {
+    res.json(`server is running`);
+});
+
 // Endpoint to delete a question
-app.delete('/delete-question/:id', async (req, res) => {
+app.delete('/api/delete-question/:id', async (req, res) => {
     const questionId = parseInt(req.params.id, 10);
-    console.log(questionId)
+    console.log('Received request to delete question with ID:', questionId);
 
     if (isNaN(questionId)) {
+        console.error('Invalid question ID');
         return res.status(400).json({ success: false, message: 'Invalid question ID' });
     }
 
     try {
-        const questionIndex = newData.findIndex((item) => item.id === questionId);
+        const questionIndex = newData.findIndex(item => item.id === questionId);
+        console.log('Finding question at index:', questionIndex);
 
         if (questionIndex === -1) {
             return res.status(404).json({ success: false, message: 'Question not found' });
         }
 
-        // Remove the question from the array
         newData.splice(questionIndex, 1);
-
-        // Save updated data to the file
         await saveNewDataToFile(newData);
-
+        
         res.json({ success: true, message: 'Question deleted successfully' });
     } catch (err) {
-        console.error('Error processing delete question:', err);
+        console.error('Error processing delete question:', err.stack);
         res.status(500).json({ success: false, message: 'Error deleting question' });
     }
 });
 
 
+
 // Endpoint to update query data
-app.post('/update-data', async (req, res) => {
+app.post('/api/update-data', async (req, res) => {
     const { updatedQuestions } = req.body;
 
     if (!Array.isArray(updatedQuestions) || updatedQuestions.length === 0) {
@@ -111,14 +116,13 @@ app.post('/update-data', async (req, res) => {
 });
 
 // Endpoint to add a new question
-app.post('/add-question', async (req, res) => {
+app.post('/api/add-question', async (req, res) => {
     const { newQuestion, newPhrase, isPositive, index } = req.body;
 
     if (!newQuestion || !newPhrase || typeof isPositive === 'undefined' || typeof index !== 'number') {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
     }
 
-    // Find the next available ID
     const existingIds = newData.map(item => item.id);
     let newId = 1;
     while (existingIds.includes(newId)) {
@@ -147,6 +151,7 @@ app.get('/api/data', (req, res) => {
     res.json(newData);
 });
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
