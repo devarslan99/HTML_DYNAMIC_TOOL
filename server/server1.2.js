@@ -78,14 +78,13 @@ app.get("/", (req, res) => {
 // Create a new question
 app.post('/api/add-question', async (req, res) => {
     const { newQuestion, newPhrase, isPositive, index } = req.body;
-
     if (!newQuestion || !newPhrase || typeof isPositive === 'undefined' || typeof index === 'undefined') {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
     }
 
     try {
         // Step 1: Fetch all questions with id >= index and sort them in descending order
-        const questionsToShift = await Question.find({ id: { $gte: index } }).sort({ id: -1 });
+        const questionsToShift = await Question.find({ id: { $gte: Number(index) } }).sort({ id: -1 });
 
         // Step 2: Increment the ids one by one to prevent duplicate id conflict
         for (const question of questionsToShift) {
@@ -98,7 +97,7 @@ app.post('/api/add-question', async (req, res) => {
             question: newQuestion,
             phrase: newPhrase,
             isPositive,
-            id: index
+            id: Number(index)
         });
 
         // Step 4: Save the new question
