@@ -72,7 +72,95 @@ app.get("/", (req, res) => {
     res.json(`Server is running`);
 });
 
-// REST of your CRUD operations...
+// CRUD Operations
+
+// Create a new question
+app.post('/api/add-question', async (req, res) => {
+    const { question, phrase, isPositive } = req.body;
+
+    if (!question || !phrase || typeof isPositive === 'undefined') {
+        return res.status(400).json({ success: false, message: 'Invalid input data' });
+    }
+
+    try {
+        const lastQuestion = await Question.findOne().sort({ id: -1 });
+        const newId = lastQuestion ? lastQuestion.id + 1 : 1;
+
+        const newQuestion = new Question({
+            question,
+            phrase,
+            isPositive,
+            id: newId
+        });
+
+        await newQuestion.save();
+        res.json({ success: true, message: 'Question added successfully' });
+    } catch (err) {
+        console.error('Error adding question:', err);
+        res.status(500).json({ success: false, message: 'Error adding question' });
+    }
+});
+
+// Update an existing question
+app.post('/api/update-data', async (req, res) => {
+    const { id, question, phrase, isPositive } = req.body;
+
+    try {
+        const updatedQuestion = await Question.findOneAndUpdate(
+            { id },
+            {
+                $set: {
+                    question: question || undefined,
+                    phrase: phrase || undefined,
+                    isPositive: typeof isPositive === 'boolean' ? isPositive : undefined
+                }
+            },
+            { new: true }
+        );
+
+        if (!updatedQuestion) {
+            return res.status(404).json({ success: false, message: 'Question not found' });
+        }
+
+        res.json({ success: true, message: 'Data updated successfully', updatedQuestion });
+    } catch (err) {
+        console.error('Error updating data:', err);
+        res.status(500).json({ success: false, message: 'Error updating data' });
+    }
+});
+
+// Delete a question
+app.delete('/api/delete-question/:id', async (req, res) => {
+    const questionId = parseInt(req.params.id, 10);
+
+    if (isNaN(questionId)) {
+        return res.status(400).json({ success: false, message: 'Invalid question ID' });
+    }
+
+    try {
+        const deletedQuestion = await Question.findOneAndDelete({ id: questionId });
+
+        if (!deletedQuestion) {
+            return res.status(404).json({ success: false, message: 'Question not found' });
+        }
+
+        res.json({ success: true, message: 'Question deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting question:', err);
+        res.status(500).json({ success: false, message: 'Error deleting question' });
+    }
+});
+
+// Fetch all questions
+app.get('/api/data', async (req, res) => {
+    try {
+        const questions = await Question.find({});
+        res.json(questions);
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).json({ success: false, message: 'Error fetching data' });
+    }
+});
 
 // Start the server
 app.listen(PORT, () => {
