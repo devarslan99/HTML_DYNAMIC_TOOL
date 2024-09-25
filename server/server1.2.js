@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import Question from './models/questionModel.js'; // Importing the Mongoose model
+import Question from './questionModel.js'; // Importing the Mongoose model
 
 const app = express();
 const PORT = 3000;
