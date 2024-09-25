@@ -16,10 +16,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://saadumer5476:aaSSddFF%40123%23@html.uewjc.mongodb.net/?retryWrites=true&w=majority&appName=html', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
+mongoose.connect('mongodb+srv://saadumer5476:aaSSddFF%40123%23@html.uewjc.mongodb.net/?retryWrites=true&w=majority&appName=html').then(() => {
     console.log('Connected to MongoDB');
     // Add predefined questions after successful connection
     addPredefinedQuestions();
@@ -48,6 +45,7 @@ const predefinedQuestions = [
 
 // Function to add predefined questions to the database
 const addPredefinedQuestions = async () => {
+    console.log("Adding Questions");
     try {
         // Loop through predefined questions
         for (const questionData of predefinedQuestions) {
@@ -55,6 +53,7 @@ const addPredefinedQuestions = async () => {
             const existingQuestion = await Question.findOne({ id: questionData.id });
             if (!existingQuestion) {
                 // If the question doesn't exist, add it to the database
+                console.log('Question Donot Exist');
                 const newQuestion = new Question(questionData);
                 await newQuestion.save();
                 console.log(`Question with id ${questionData.id} added to the database.`);
