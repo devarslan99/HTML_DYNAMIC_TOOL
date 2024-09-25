@@ -84,13 +84,16 @@ app.post('/api/add-question', async (req, res) => {
     }
 
     try {
-        // First, increment the IDs of all questions that have an id >= index
-        await Question.updateMany(
-            { id: { $gte: index } },   // Find all questions with id greater than or equal to the new index
-            { $inc: { id: 1 } }        // Increment their id by 1
-        );
+        // Step 1: Fetch all questions with id >= index and sort them in descending order
+        const questionsToShift = await Question.find({ id: { $gte: index } }).sort({ id: -1 });
 
-        // Now create the new question with the given index (id)
+        // Step 2: Increment the ids one by one to prevent duplicate id conflict
+        for (const question of questionsToShift) {
+            question.id += 1;
+            await question.save();
+        }
+
+        // Step 3: Now create the new question with the given index (id)
         const newQuestionObj = new Question({
             question: newQuestion,
             phrase: newPhrase,
@@ -98,7 +101,7 @@ app.post('/api/add-question', async (req, res) => {
             id: index
         });
 
-        // Save the new question
+        // Step 4: Save the new question
         await newQuestionObj.save();
 
         res.json({ success: true, message: 'Question added successfully' });
@@ -107,6 +110,7 @@ app.post('/api/add-question', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error adding question' });
     }
 });
+
 
 
 // Update an existing question
