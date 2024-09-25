@@ -68,7 +68,7 @@ const addPredefinedQuestions = async () => {
 
 // Basic health check endpoint
 app.get("/", (req, res) => {
-    addPredefinedQuestions();
+    // addPredefinedQuestions();
     res.json(`Server is running`);
 
 });
