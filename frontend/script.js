@@ -1,13 +1,13 @@
 import { generatePDF } from "./generatePDF.js";
-import { BASE_URL } from "./config.js";
 
+//
 let query = {};
 let questions = {};
 let ratingText = {
     "1": "Strongly Disagree",
     "2": "Disagree",
     "3": "Somewhat Disagree",
-    "4": "Neither Agree nor Disagree",
+    "4": "Neither Agree<br>nor Disagree",
     "5": "Somewhat Agree",
     "6": "Agree",
     "7": "Strongly Agree"
@@ -27,7 +27,7 @@ let newData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server
-    fetch(`${BASE_URL}/api/data`, {
+    fetch('https://html-dynamic-tool.vercel.app/api/data', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -116,23 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
             form.innerHTML += questionHTML;
         });
 
-        // Set up event listeners
-        // document.getElementById('submitButton').addEventListener('click', calculateScore);
-        
-        // document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
-           // Set up event listeners
-        document.getElementById('submitButton').addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default form submission
-            const formValid = validateForm(); // Call validation function
 
-            if (formValid) {
-                calculateScore(); // Only call calculateScore if form is valid
-            } else {
-                alert("Please provide an answer to each question."); // Show a popup
-            }
-        });
-        
-        document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
+document.getElementById('submitButton').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+
+
+    // Call validation function
+    const formValid = validateForm(); 
+
+    // Check if form is valid
+    if (!formValid) {
+        const unansweredQuestions = getUnansweredQuestions();
+        alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
+        return; // Stop further execution if the form is invalid
+    }
+      // Check if both identifiers are filled
+  
+
+    // If both identifiers are filled and form is valid, calculate score
+    calculateScore();
+
+      setTimeout(() => {
+        document.getElementById('generatePDFButton').style.display = 'inline-block';
+    }, 2000); // Delay of 2000ms (2 seconds)
+});
+
+document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
+
     })
     
     .catch(error => console.error('Error fetching data:', error));
@@ -153,52 +164,76 @@ function validateForm() {
 
     return allAnswered; // Return true if all questions are answered, otherwise false
 }
+function getUnansweredQuestions() {
+    const questions = document.querySelectorAll('.question'); // Assuming each question has a class 'question'
+    const unanswered = [];
+
+    questions.forEach((question, index) => {
+        if (!question.querySelector('input:checked')) {
+            unanswered.push(index + 1); // Store question number (1-based index)
+        }
+    });
+
+    return unanswered;
+}
+document.getElementById('Rater').addEventListener('click', function() {
+  this.style.boxShadow = 'none'; // Remove the shadow on click
+
+});
+
+document.getElementById('identifier').addEventListener('click', function() {
+  this.style.boxShadow = 'none'; // Remove the shadow on click
+});
 
 function calculateScore() {
     document.getElementById("spinner").style.display = "block";
 
     setTimeout(() => {
-        let score = 0;
+
+  let score =50;
         const answers = {};
 
-        positiveQuestions.forEach(index => {
-            const value = document.querySelector(`input[name="q${index}"]:checked`);
+        // Iterate through all questions
+        newData.forEach(item => {
+            const questionId = item.id;
+            const value = document.querySelector(`input[name="q${questionId}"]:checked`);
             if (value) {
                 const val = parseInt(value.value);
-                const normalizedVal = (val - 4) * 1.04;
+                const normalizedVal = item.isPositive 
+                    ? (val - 4) * 1.25 // For positive questions
+                    : (4 - val) * 1.25; // For negative questions
+
                 score += normalizedVal;
-                answers[`q${index}`] = (val - 4) * 33.33;
+                answers[`q${questionId}`] = (item.isPositive ? (val - 4) : (4 - val)) * 33.33;
             }
         });
 
-        negativeQuestions.forEach(index => {
-            const value = document.querySelector(`input[name="q${index}"]:checked`);
-            if (value) {
-                const val = parseInt(value.value);
-                const normalizedVal = (4 - val) * 1.04;
-                score += normalizedVal;
-                answers[`q${index}`] = (4 - val) * 33.33;
-            }
-        });
-
-        score = Math.max(0, Math.min(10, score)).toFixed(1); // Ensure score stays between 0-10
-
+        // Final score adjustment to be between 0 and 10
+        score = (Math.max(0, Math.min(100, score)).toFixed(1)/10).toFixed(1);
         document.getElementById("score").innerText = `The provider's readiness score is ${score}`;
 
-        // Determine strengths and weaknesses
+
+   // Determine strengths and weaknesses
         const sortedAnswers = Object.entries(answers).sort((a, b) => b[1] - a[1]);
+
         const strengths = sortedAnswers.slice(0, 2).map(([key]) => {
             const question = questions[key];
-            return `${question}: ${ratingText[Math.round((answers[key] / 33.33) + 4)]}`;
+            // Fixed rounding logic to correctly map values to ratings
+            return `${question}: ${AnswerText[Math.round((answers[key] / 33.33) + 4)]}`;  // Correction: Ensured rounding works properly
         });
+        
         const weaknesses = sortedAnswers.slice(-2).map(([key]) => {
             const question = questions[key];
-            return `${question}: ${ratingText[Math.round((answers[key] / 33.33) + 4)]}`;
+            // Fixed rounding logic to correctly map values to ratings
+            return `${question}: ${AnswerText[Math.round((answers[key] / 33.33) + 4)]}`;  // Correction: Ensured rounding works properly
         });
 
         document.getElementById("strengths").innerText = strengths.join('\n');
         document.getElementById("weaknesses").innerText = weaknesses.join('\n');
-
+        //  document.getElementById("feedback-container").style.display = 'block';
+          // Show feedback and chart containers
+        document.querySelector('.feedback-container').style.display = 'block';
+        document.querySelector('.chart-container').style.display = 'block';
         // Display bar chart
         const barChart = document.getElementById("barChart");
         const elementPosition = barChart.getBoundingClientRect().top + window.scrollY;

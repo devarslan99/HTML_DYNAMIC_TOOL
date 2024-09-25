@@ -7,7 +7,8 @@ body {
     justify-content: center;
     align-items: center;
 }
-.parent{
+
+.parent {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,7 +33,8 @@ h1 {
     text-align: center;
 }
 
-select, input[type="text"] {
+select,
+input[type="text"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -56,6 +58,8 @@ button {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-bottom: 10px;
+    /* Add margin between buttons */
 }
 
 button:hover {
@@ -66,8 +70,8 @@ button:active {
     background-color: #00408d;
 }
 
-.container select:focus, 
-.container input[type="text"]:focus, 
+.container select:focus,
+.container input[type="text"]:focus,
 .container button:focus {
     outline: none;
 }
@@ -102,17 +106,21 @@ select {
     font-size: 16px;
     appearance: none;
     overflow: hidden;
-    white-space: nowrap; /* Force single line text */
-    text-overflow: ellipsis; /* Show ellipsis if text is too long */
+    white-space: nowrap;
+    /* Force single line text */
+    text-overflow: ellipsis;
+    /* Show ellipsis if text is too long */
 }
 
 /* Option elements can't directly apply ellipsis but ensure single line display */
 option {
     white-space: nowrap;
-    overflow: hidden; 
+    overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%; /* Prevent text from overflowing container */
+    max-width: 100%;
+    /* Prevent text from overflowing container */
 }
+
 .container-add-question {
     background-color: #fff;
     padding: 20px;
@@ -123,11 +131,16 @@ option {
     box-sizing: border-box;
     margin-top: 50px;
 }
-.container-add-question label{
+
+.container-add-question label {
     display: block;
     margin-bottom: 5px;
 }
-.container-add-question input[type="text"], input[type="number"], textarea, select {
+
+.container-add-question input[type="text"],
+input[type="number"],
+textarea,
+select {
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;

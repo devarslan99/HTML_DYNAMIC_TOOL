@@ -1,8 +1,7 @@
-import { BASE_URL } from "./config.js";
-
+//
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server and populate dropdown
-    fetch(`${BASE_URL}/api/data`)
+    fetch('https://html-dynamic-tool.vercel.app/api/data')
         .then(response => response.json())
         .then(data => {
             const dropdown = document.getElementById('questionDropdown');
@@ -28,6 +27,31 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error fetching data:', error));
 });
+// for question deletion 
+document.getElementById('deleteButton').addEventListener('click', (e) => {
+    console.log(e)
+    const selectedId = document.getElementById('questionDropdown').value;
+
+    if (selectedId) {
+        // Send request to delete the question
+        fetch(`https://html-dynamic-tool.vercel.app/api/delete-question/${selectedId}`, {
+            method: 'DELETE',
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Question deleted successfully!');
+                // Optionally refresh or update the dropdown
+                location.reload();
+            } else {
+                alert('Failed to delete question.');
+            }
+        })
+        .catch(error => console.error('Error deleting question:', error));
+    } else {
+        alert('Please select a question to delete.');
+    }
+});
 
 // Handle question update
 document.getElementById('saveButton').addEventListener('click', () => {
@@ -44,13 +68,15 @@ document.getElementById('saveButton').addEventListener('click', () => {
             isPositive: updatedIsPositive
         };
 
+        console.log(updatedQuestion);
+
         // Send updated data to the backend
-        fetch(`${BASE_URL}/update-data`, {
+        fetch('https://html-dynamic-tool.vercel.app/api/update-data', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ updatedQuestions: [updatedQuestion] })
+            body: JSON.stringify(updatedQuestion) // <-- Corrected here
         })
         .then(response => response.json())
         .then(result => {
@@ -65,6 +91,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
         alert('Please select a question and fill in the required fields.');
     }
 });
+
 
 // Handle adding new questions
 document.getElementById('add-question-form').addEventListener('submit', function(event) {
@@ -88,7 +115,7 @@ document.getElementById('add-question-form').addEventListener('submit', function
     };
 
     // Send the new question data to the backend
-    fetch(`${BASE_URL}/add-question`, {
+    fetch('https://html-dynamic-tool.vercel.app/api/add-question', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
