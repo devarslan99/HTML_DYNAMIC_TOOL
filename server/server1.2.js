@@ -1,155 +1,121 @@
 import express from 'express';
-import fs from 'fs/promises';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Create __filename and __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Define the path to the data file
-const dataFilePath = path.join(__dirname, 'newData.js');
-
-// Load initial data
-let newData;
-try {
-    newData = (await import('./newData.js')).newData;
-    console.log('Initial data loaded:', newData); // Log loaded data
-} catch (err) {
-    console.error('Error loading initial data:', err);
-    process.exit(1);  // Exit the process if data cannot be loaded
-}
+import mongoose from 'mongoose';
+import Question from './models/questionModel.js'; // Importing the Mongoose model
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors({
     origin: '*', // Allows all origins
-    methods: ['GET', 'POST', 'DELETE', 'PUT'], // Allowed methods
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
     allowedHeaders: ['Content-Type']
 }));
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
 
-const saveNewDataToFile = async (updatedData) => {
-    const newFileContent = `const newData = ${JSON.stringify(updatedData, null, 2)};\nexport { newData };`;
-    console.log('Saving data to file:', newFileContent); // Log data being saved
-
-    try {
-        await fs.writeFile(dataFilePath, newFileContent, 'utf8');
-        console.log('Data saved successfully'); // Log success
-    } catch (err) {
-        console.error('Error writing file:', err);
-        throw new Error('Error updating data');
-    }
-};
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://saadumer5476:aaSSddFF%40123%23@html.uewjc.mongodb.net/?retryWrites=true&w=majority&appName=html', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+});
 
 // Basic health check endpoint
 app.get("/", (req, res) => {
-    res.json(`server is running`);
+    res.json(`Server is running`);
 });
 
-// Endpoint to delete a question
-app.delete('/api/delete-question/:id', async (req, res) => {
-    const questionId = parseInt(req.params.id, 10);
-    console.log('Received request to delete question with ID:', questionId);
-
-    if (isNaN(questionId)) {
-        console.error('Invalid question ID');
-        return res.status(400).json({ success: false, message: 'Invalid question ID' });
-    }
-
-    try {
-        const questionIndex = newData.findIndex(item => item.id === questionId);
-        console.log('Finding question at index:', questionIndex);
-
-        if (questionIndex === -1) {
-            return res.status(404).json({ success: false, message: 'Question not found' });
-        }
-
-        newData.splice(questionIndex, 1);
-        await saveNewDataToFile(newData);
-        
-        res.json({ success: true, message: 'Question deleted successfully' });
-    } catch (err) {
-        console.error('Error processing delete question:', err.stack);
-        res.status(500).json({ success: false, message: 'Error deleting question' });
-    }
-});
-
-
-
-// Endpoint to update query data
-app.post('/api/update-data', async (req, res) => {
-    console.log('Request Recieved For Update Question');
-    // const { updatedQuestions } = req.body;
-
-    // if (!Array.isArray(updatedQuestions) || updatedQuestions.length === 0) {
-    //     return res.status(400).json({ success: false, message: 'Invalid data' });
-    // }
-
-    try {
-        // updatedQuestions.forEach((updatedQuestion) => {
-            const { id, question, phrase, isPositive } = req.body;
-            const questionIndex = newData.findIndex((item) => item.id === id);
-
-            if (questionIndex !== -1) {
-                newData[questionIndex] = {
-                    ...newData[questionIndex],
-                    question: question || newData[questionIndex].question,
-                    phrase: phrase || newData[questionIndex].phrase,
-                    isPositive: typeof isPositive === 'boolean' ? isPositive : newData[questionIndex].isPositive
-                };
-            } else {
-                console.warn(`Question with id ${id} not found, skipping.`);
-            }
-        // });
-
-        await saveNewDataToFile(newData);
-        res.json({ success: true, message: 'Data updated successfully' });
-    } catch (err) {
-        console.error('Error processing update:', err);
-        res.status(500).json({ success: false, message: 'Error processing update' });
-    }
-});
-
-// Endpoint to add a new question
+// Create a new question
 app.post('/api/add-question', async (req, res) => {
-    const { newQuestion, newPhrase, isPositive, index } = req.body;
+    const { question, phrase, isPositive } = req.body;
 
-    if (!newQuestion || !newPhrase || typeof isPositive === 'undefined' || typeof index !== 'number') {
+    if (!question || !phrase || typeof isPositive === 'undefined') {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
     }
 
-    const existingIds = newData.map(item => item.id);
-    let newId = 1;
-    while (existingIds.includes(newId)) {
-        newId++;
-    }
-
-    const newQuestionObject = {
-        question: newQuestion,
-        phrase: newPhrase,
-        isPositive,
-        id: newId
-    };
-
     try {
-        newData.splice(index, 0, newQuestionObject);
-        await saveNewDataToFile(newData);
+        const lastQuestion = await Question.findOne().sort({ id: -1 });
+        const newId = lastQuestion ? lastQuestion.id + 1 : 1;
+
+        const newQuestion = new Question({
+            question,
+            phrase,
+            isPositive,
+            id: newId
+        });
+
+        await newQuestion.save();
         res.json({ success: true, message: 'Question added successfully' });
     } catch (err) {
-        console.error('Error processing add question:', err);
+        console.error('Error adding question:', err);
         res.status(500).json({ success: false, message: 'Error adding question' });
     }
 });
 
-// Endpoint to fetch data
-app.get('/api/data', (req, res) => {
-    res.json(newData);
+// Update an existing question
+app.post('/api/update-data', async (req, res) => {
+    const { id, question, phrase, isPositive } = req.body;
+
+    try {
+        const updatedQuestion = await Question.findOneAndUpdate(
+            { id },
+            {
+                $set: {
+                    question: question || undefined,
+                    phrase: phrase || undefined,
+                    isPositive: typeof isPositive === 'boolean' ? isPositive : undefined
+                }
+            },
+            { new: true }
+        );
+
+        if (!updatedQuestion) {
+            return res.status(404).json({ success: false, message: 'Question not found' });
+        }
+
+        res.json({ success: true, message: 'Data updated successfully', updatedQuestion });
+    } catch (err) {
+        console.error('Error updating data:', err);
+        res.status(500).json({ success: false, message: 'Error updating data' });
+    }
+});
+
+// Delete a question
+app.delete('/api/delete-question/:id', async (req, res) => {
+    const questionId = parseInt(req.params.id, 10);
+
+    if (isNaN(questionId)) {
+        return res.status(400).json({ success: false, message: 'Invalid question ID' });
+    }
+
+    try {
+        const deletedQuestion = await Question.findOneAndDelete({ id: questionId });
+
+        if (!deletedQuestion) {
+            return res.status(404).json({ success: false, message: 'Question not found' });
+        }
+
+        res.json({ success: true, message: 'Question deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting question:', err);
+        res.status(500).json({ success: false, message: 'Error deleting question' });
+    }
+});
+
+// Fetch all questions
+app.get('/api/data', async (req, res) => {
+    try {
+        const questions = await Question.find({});
+        res.json(questions);
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).json({ success: false, message: 'Error fetching data' });
+    }
 });
 
 // Start the server
