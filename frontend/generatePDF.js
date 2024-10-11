@@ -1,9 +1,9 @@
 function generatePDF() {
-    console.log('generate PDF function called');
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.setFont("helvetica");
-//
+    //
+    console.log('generate PDF function called');
     const margin = 10;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -79,7 +79,9 @@ doc.text("Testimonial Readiness Assessment Score:", 12, 87); // Add the text
 
 
 const scoreString = document.getElementById("score").innerText;
-let score = scoreString.split('is')[1];
+console.log('This is the scoreString',scoreString);
+let score = scoreString
+// let score = scoreString.split('is')[1];
  const padding =9
 // Define the position and dimensions of the rounded box
 const x = 9;
