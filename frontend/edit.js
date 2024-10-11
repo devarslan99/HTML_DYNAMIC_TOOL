@@ -82,6 +82,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
         .then(result => {
             if (result.success) {
                 alert('Question updated successfully!');
+                location.reload();
             } else {
                 alert('Failed to update question.');
             }
@@ -128,6 +129,7 @@ document.getElementById('add-question-form').addEventListener('submit', function
         if (result.success) {
             responseMessage.textContent = 'Question added successfully!';
             responseMessage.style.color = 'green';
+            location.reload();
         } else {
             responseMessage.textContent = 'Error: ' + result.message;
             responseMessage.style.color = 'red';
