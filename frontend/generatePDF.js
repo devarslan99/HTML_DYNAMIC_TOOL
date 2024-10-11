@@ -3,7 +3,7 @@ function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.setFont("helvetica");
-
+//
     const margin = 10;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -13,14 +13,35 @@ function generatePDF() {
     doc.setFont("helvetica", "bold");
     doc.text("Testimonial Readiness Assessment Score", 37,10);
     //   doc.setFont("helvetica", "bold");
-     doc.setFontSize(15);
+     doc.setFontSize(11);
      doc.text("Data Output and Assessment Scores", 10, 30);
 
     const Identifier = document.getElementById("identifier").value;
    const rater = document.getElementById("Rater").value; // Retrieve the value of the Rater input
-doc.setFontSize(15);
+  doc.setFontSize(11);
 doc.setTextColor(0, 0, 0);
-doc.text(`Rater Name or Identifier: ${rater}`, 10,56); // Add the Rater value into the PDF
+const offset1 = 10;  // Position offset for the text
+const textY = 56;  // Y position for the text
+const underlineY1 = textY + 1; // Y position for the underline, slightly below the text
+
+// Add the text
+doc.text(`Rater Name / Identifier :`, offset1, textY);
+
+const staticTextWidth = doc.getTextWidth('Rater Name / Identifier:');
+const raterX = 17 + staticTextWidth
+doc.text(`${rater}`, raterX, textY);
+// Calculate the width of the text
+ doc.getTextWidth(`Rater Name or Identifier : ${rater}`);
+doc.setLineWidth(0.5);
+// Set the underline start and end positions based on the text width
+const underlineStartX = offset1 +  48;
+const underlineEndX = underlineStartX + 30;  // Extend the underline by 12 units after the text
+
+// Set the color for the underline
+doc.setDrawColor(0, 0, 0);
+
+// Draw the underline after the text
+doc.line(underlineStartX, underlineY1, underlineEndX, underlineY1);
 
     // Get today's date dynamically
    
@@ -30,9 +51,27 @@ doc.text(`Rater Name or Identifier: ${rater}`, 10,56); // Add the Rater value in
         month: "long",
         day: "numeric"
     });
-        doc.setFontSize(15);
-    doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 47);
-        doc.setFontSize(15);
+    doc.setFontSize(11);
+    // doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 47);
+    const offset2 = 10;  // Position offset for the text
+const textY2 = 47;  // Y position for the text
+const underlineY2 = 48 ; // Y position for the underline, slightly below the text
+
+// Add the text
+doc.text(`Provider Name / Identifier: ${Identifier}`, offset2, textY2);
+// Calculate the width of the text
+const textWidth2 = doc.getTextWidth(`Provider Name / Identifier: ${Identifier}`);
+doc.setLineWidth(0.5);
+// Set the underline start and end positions based on the text width
+const underlineStartX2 = offset2 + 48;
+const underlineEndX2 = underlineStartX2 + 30;  // Extend the underline by 12 units after the text
+
+// Set the color for the underline
+doc.setDrawColor(0, 0, 0);
+
+// Draw the underline after the text
+doc.line(underlineStartX2, underlineY2, underlineEndX2, underlineY2);
+        doc.setFontSize(11);
     doc.text(`Assessment Date: ${formattedDate}`, 10, 38);
    doc.setFontSize(16); // Set the font size
 doc.setTextColor(0, 48, 143); // Set the text color
@@ -43,9 +82,9 @@ const scoreString = document.getElementById("score").innerText;
 let score = scoreString.split('is')[1];
  const padding =9
 // Define the position and dimensions of the rounded box
-const x = 8;
+const x = 9;
 const y = 80;
-const width = 184; // Adjust width as needed
+const width = 187; // Adjust width as needed
 const height = 20+padding; // Adjust height as needed
 const radius = 5; // Radius of the rounded corners
 
@@ -137,7 +176,7 @@ const boxPadding = 10; // Padding around the content
 // Adjust box width and X position to decrease width from the right
 const decreaseAmount = 3; // Amount to decrease the width by
 const boxX = 5 + decreaseAmount; // Shift X position to the right
-const boxWidth = 188 - decreaseAmount; // Decrease the width of the box
+const boxWidth = 192 - decreaseAmount; // Decrease the width of the box
 
 // Increase the box height towards the top
 const boxY = topStrengthsY - 25; // Y position for the box
@@ -160,7 +199,26 @@ doc.roundedRect(boxX, boxY, boxWidth, boxHeight, boxRadius, boxRadius, 'D'); // 
         doc.setFont("helvetica");
 // 
         // Capture the Bar Chart
-        html2canvas(document.querySelector("#chartContainer"), { scale: 1.5 }).then(canvas => {
+        html2canvas(document.querySelector("#chartContainer"), { 
+    scale: 1.5, // Increase scale for better quality
+    useCORS: true, // If needed for external resources like images
+    backgroundColor: null, // Transparent background if needed
+    onclone: (clonedDoc) => {
+        // Increase font size in the cloned document, but with controlled scaling
+        clonedDoc.querySelectorAll('*').forEach(el => {
+            let computedStyle = window.getComputedStyle(el);
+            let fontSize = parseFloat(computedStyle.fontSize); // Get current font size
+
+            // Controlled font size increase with a maximum limit
+            let newFontSize = fontSize * 1.2; // Adjust the multiplier (use 1.2 instead of 1.5)
+            if (newFontSize > 19) { // Set a maximum font size (e.g., 24px)
+                newFontSize = 19;
+            }
+
+            el.style.fontSize = newFontSize + 'px'; // Apply the new font size
+        });
+    }
+}).then(canvas => {
             const imgWidth = canvas.width;
             const imgHeight = canvas.height;
 
@@ -170,7 +228,7 @@ doc.roundedRect(boxX, boxY, boxWidth, boxHeight, boxRadius, boxRadius, 'D'); // 
             let startCropY = 0; // Initial start point for cropping
 
             // Function to crop and add image to PDF
-            const addImageToPDF = (startY, height, yPos, scale = 7) => {
+            const addImageToPDF = (startY, height, yPos, scale = 10) => {
                 if (height <= 0) return; // No more content to add
 
                 const croppedCanvas = document.createElement('canvas');
@@ -203,50 +261,69 @@ doc.roundedRect(boxX, boxY, boxWidth, boxHeight, boxRadius, boxRadius, 'D'); // 
                 doc.setFont("helvetica", "bold");
                  doc.setTextColor(0, 0, 0);
                 doc.text("Testimonial Readiness Assessment Score", 37, 12);
-                doc.setFontSize(14);
+                doc.setFontSize(11);
                 const Identifier = document.getElementById("identifier").value;
                      doc.setTextColor(0, 0, 0);
-          doc.setFontSize(15);
-        doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 40);
-//         const scoreString = document.getElementById("score").innerText;
-//         let score = scoreString.split('is')[1];
-//      doc.setFontSize(16);
-//      doc.setTextColor(0, 0, 0);
-//      doc.text("Your provider's overall testimonial readiness score is:", 10, 60);
-//     doc.setFontSize(16);
-//     doc.setFont("helvetica", "bold");
-//     doc.setTextColor(200, 0, 0);
-//     doc.text(`${score}`, 155, 60);
-//       // Draw the underline
-//     const textWidth = doc.getTextWidth(score);
+          doc.setFontSize(11);
+        // doc.text(`Provider Name or Identifier: ${Identifier}`, 10, 40);
+const offset2 = 10;  // Position offset for the text
+const textY2 = 40;  // Y position for the text
+const underlineY2 = 41 ; // Y position for the underline, slightly below the text
 
-// // Add an underline
-// doc.setLineWidth(1)
-// const underlineY = 63; // Adjust the Y position for the underline
-//  doc.setDrawColor(200, 0, 0);
-// doc.line(157 , underlineY, 155 + textWidth, underlineY);
+// Add the text
+doc.text(`Provider Name / Identifier: ${Identifier}`, offset2, textY2);
+// Calculate the width of the text
+const textWidth2 = doc.getTextWidth(`Provider Name / Identifier: ${Identifier}`);
+doc.setLineWidth(0.5);
+// Set the underline start and end positions based on the text width
+const underlineStartX2 = offset2 + 48;
+const underlineEndX2 = underlineStartX2 + 30;  // Extend the underline by 12 units after the text
 
-// doc.setTextColor(0, 48, 143); // Blue border color
-// doc.setFontSize(23);
-  
-//     doc.text(" out of 10", 167, 60);
+// Set the color for the underline
+doc.setDrawColor(0, 0, 0);
+
+// Draw the underline after the text
+doc.line(underlineStartX2, underlineY2, underlineEndX2, underlineY2);
+
     // Get today's date 
- const rater = document.getElementById("Rater").value; // Retrieve the value of the Rater input
-doc.setFontSize(15);
+const rater = document.getElementById("Rater").value; // Retrieve the value of the Rater input
+doc.setFontSize(11);
 doc.setTextColor(0, 0, 0);
-doc.text(`Rater Name or Identifier: ${rater}`, 10,50); // Add the Rater value into the PDF
+// doc.text(`Rater Name or Identifier: ${rater}`, 10,50); // Add the Rater value into the PDF
+const offset1 = 10;  // Position offset for the text
+const textY = 50;  // Y position for the text
+const underlineY1 = textY + 1; // Y position for the underline, slightly below the text
+
+// Add the text
+doc.text(`Rater Name / Identifier :`, offset1, textY);
+
+const staticTextWidth = doc.getTextWidth('Rater Name / Identifier:');
+const raterX = 17 + staticTextWidth
+doc.text(`${rater}`, raterX, textY);
+// Calculate the width of the text
+ doc.getTextWidth(`Rater Name / Identifier : ${rater}`);
+doc.setLineWidth(0.5);
+// Set the underline start and end positions based on the text width
+const underlineStartX = offset1 +  48;
+const underlineEndX = underlineStartX + 30;  // Extend the underline by 12 units after the text
+
+// Set the color for the underline
+doc.setDrawColor(0, 0, 0);
+
+// Draw the underline after the text
+doc.line(underlineStartX, underlineY1, underlineEndX, underlineY1);
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric"
     });
-    doc.setFontSize(15);
+    doc.setFontSize(11);
 
     doc.text(`Assessment Date: ${formattedDate}`, 10, 30);
                 
                 doc.setTextColor(0, 0, 0)
-                doc.setFontSize(14)
+                doc.setFontSize(11)
                 doc.text("Sub-scales(continued):", 10, 69);
                 
 
@@ -298,17 +375,40 @@ doc.setFontSize(14);
 doc.setFont("helvetica", "bold");
 
 // Center Subtitle
-const subtitleYPosition = 18;  // Adjust this to move the subtitle higher or lower
+const subtitleYPosition = 18;  // Adjust this to msove the subtitle higher or lower
 doc.text(subtitle, (pageWidth - subtitleWidth) / 2, subtitleYPosition);
 
 
             // Capture and Add Image from assessmentForm
-            html2canvas(document.querySelector("#assessmentForm"),{ scale: 1.5 }).then(canvas => {
+            html2canvas(document.querySelector("#assessmentForm"),{ 
+    scale: 1.5, // Increase scale for better quality
+    useCORS: true, // If needed for external resources like images
+    backgroundColor: null, // Transparent background if needed
+    onclone: (clonedDoc) => {
+        // Increase font size and enhance styling for only span elements associated with radio buttons
+        clonedDoc.querySelectorAll('input[type="radio"] + span').forEach(el => {
+            let computedStyle = window.getComputedStyle(el);
+            let fontSize = parseFloat(computedStyle.fontSize); // Get current font size
+
+            // Controlled font size increase
+            let newFontSize = fontSize * 1.2; // Adjust the multiplier (e.g., 1.2)
+            if (newFontSize > 28) { // Set a maximum font size, if needed
+                newFontSize = 28;
+            }
+
+            // Apply enhanced styling for visual clarity
+            el.style.fontSize = newFontSize + 'px'; // Apply the new font size
+            el.style.fontWeight = 'bold'; // Make text bold
+            // el.style.color = '#000000'; // Change text color to black for better contrast
+            // el.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.2)'; // Add a slight text shadow for depth
+        });
+    }
+}).then(canvas => {
                 const imgData = canvas.toDataURL("image/png");
                 const imgWidth = canvas.width;
                 const imgHeight = canvas.height;
 
-                let yPosition = 23; // Start position for assessment form on third page
+                let yPosition = 22; // Start position for assessment form on third page
                 let remainingHeight = imgHeight;
                 let startCropY = 0; // Initial start point for cropping
 
@@ -331,7 +431,7 @@ doc.text(subtitle, (pageWidth - subtitleWidth) / 2, subtitleYPosition);
                     doc.addImage(croppedImgData, 'PNG', margin, yPosition, formImgWidth, formImgHeight);
                     yPosition += formImgHeight; // Update Y position for the next part
                 };
-
+        
                 // Add the first part of the assessment form image to the page
                 const thresholdHeight = 1810; // Increased crop height
                 const heightToPrint = Math.min(thresholdHeight, remainingHeight);
@@ -361,7 +461,7 @@ doc.text(subtitle, (pageWidth - subtitleWidth) / 2, subtitleYPosition);
     const identifier = document.getElementById("identifier").value;
 
     // Construct the filename
-    const instrumentName = "Testimonial Readiness Assessment - Physicians (TRA-P)"; // Use your actual instrument name
+    const instrumentName = "Testimonial Readiness Assessment"; // Use your actual instrument name
     const filename = `${instrumentName}.${identifier}.${formattedDate}.pdf`;
 
     // Your existing code for PDF content...
@@ -371,7 +471,6 @@ doc.text(subtitle, (pageWidth - subtitleWidth) / 2, subtitleYPosition);
                 
             });
         });
-    
 }
 
 export{

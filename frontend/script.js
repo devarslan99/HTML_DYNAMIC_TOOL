@@ -68,43 +68,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         </tr>
                         <tr>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-1'>
                                     <input type="radio" name="q${questionNumber}" value="1">
                                     <span>${ratingText[1]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-2'>
                                     <input type="radio" name="q${questionNumber}" value="2">
                                     <span>${ratingText[2]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-3'>
                                     <input type="radio" name="q${questionNumber}" value="3">
                                     <span>${ratingText[3]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv  radio-value-4'>
                                     <input type="radio" name="q${questionNumber}" value="4">
                                     <span>${ratingText[4]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-5'>
                                     <input type="radio" name="q${questionNumber}" value="5">
                                     <span>${ratingText[5]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-6'>
                                     <input type="radio" name="q${questionNumber}" value="6">
                                     <span>${ratingText[6]}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class='radioDiv'>
+                                <div class='radioDiv radio-value-7'>
                                     <input type="radio" name="q${questionNumber}" value="7">
                                     <span>${ratingText[7]}</span>
                                 </div>
@@ -115,12 +115,27 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             form.innerHTML += questionHTML;
         });
+// document.getElementById('generatePDFButton').addEventListener('click',generatePDF);
+// document.getElementById('submitButton').addEventListener('click', function(event) {
+//     // Prevent the default form submission
+//     event.preventDefault();
+//     // Call the function to calculate score
+//     calculateScore();
+//       const spinnerElement = document.getElementById("spinner");
+//     const elementPosition = spinnerElement.getBoundingClientRect().top + window.scrollY;
 
+//     window.scrollTo({
+//         top: elementPosition,
+//         behavior: 'smooth' // This adds a smooth scrolling effect
+//     });
+// });
+// // document.getElementById('submitButton').addEventListener('click', calculateScore);
 
 document.getElementById('submitButton').addEventListener('click', (event) => {
     event.preventDefault(); // Prevent default form submission
 
 
+  
 
     // Call validation function
     const formValid = validateForm(); 
@@ -135,11 +150,18 @@ document.getElementById('submitButton').addEventListener('click', (event) => {
   
 
     // If both identifiers are filled and form is valid, calculate score
-    calculateScore();
+   calculateScore();
+       const spinnerElement = document.getElementById("spinner");
+    const elementPosition = spinnerElement.getBoundingClientRect().top + window.scrollY;
+
+    window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth' // This adds a smooth scrolling effect
+    });
 
       setTimeout(() => {
         document.getElementById('generatePDFButton').style.display = 'inline-block';
-    }, 2000); // Delay of 2000ms (2 seconds)
+    }, 3000); // Delay of 2000ms (2 seconds)
 });
 
 document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
@@ -148,6 +170,7 @@ document.getElementById('generatePDFButton').addEventListener('click', generateP
     
     .catch(error => console.error('Error fetching data:', error));
 });
+
 function validateForm() {
     let allAnswered = true;
 
@@ -180,14 +203,23 @@ document.getElementById('Rater').addEventListener('click', function() {
   this.style.boxShadow = 'none'; // Remove the shadow on click
 
 });
-
 document.getElementById('identifier').addEventListener('click', function() {
   this.style.boxShadow = 'none'; // Remove the shadow on click
+
 });
 
-function calculateScore() {
-    document.getElementById("spinner").style.display = "block";
 
+function calculateScore() {
+    const spinnerElement = document.getElementById("spinner");
+
+
+    // Display the spinner
+    spinnerElement.style.display = "block"; // Ensure the spinner is shown
+   
+    // Hide the chart and feedback containers initially
+    document.getElementById("chartContainer").style.display = "none"; 
+    document.querySelector('.feedback-container').style.display = 'none';
+    
     setTimeout(() => {
 
   let score =50;
@@ -210,7 +242,7 @@ function calculateScore() {
 
         // Final score adjustment to be between 0 and 10
         score = (Math.max(0, Math.min(100, score)).toFixed(1)/10).toFixed(1);
-        document.getElementById("score").innerText = `The provider's readiness score is ${score}`;
+        document.getElementById("score").innerHTML = `The provider's overall testimonial readiness score is <span style="color: red; font-weight: bold; border-bottom: 3px solid red;">${score}</span>`;
 
 
    // Determine strengths and weaknesses
@@ -231,18 +263,13 @@ function calculateScore() {
         document.getElementById("strengths").innerText = strengths.join('\n');
         document.getElementById("weaknesses").innerText = weaknesses.join('\n');
         //  document.getElementById("feedback-container").style.display = 'block';
-          // Show feedback and chart containers
-        document.querySelector('.feedback-container').style.display = 'block';
-        document.querySelector('.chart-container').style.display = 'block';
+
         // Display bar chart
         const barChart = document.getElementById("barChart");
         const elementPosition = barChart.getBoundingClientRect().top + window.scrollY;
 
         // Scroll to the element's position smoothly
-        window.scrollTo({
-          top: elementPosition,
-          behavior: 'smooth' // This adds a smooth scrolling effect
-        });
+    
         barChart.innerHTML = `<div class="axis top">
         <span class="left-span" >-100</span><span class="left-span" >-75</span ><span class="left-span" >-50</span><span class="left-span" >-25</span><span class="center-span" style="width: 0;" >0</span><span class="right-span">25</span><span class="right-span" >50</span><span class="right-span">75</span><span class="right-span">100</span>
 
@@ -353,19 +380,32 @@ function calculateScore() {
         });
         
         // Trigger the animation by setting the width after rendering
-        setTimeout(() => {
-            const bars = document.querySelectorAll('.bar div');
-            bars.forEach((bar, index) => {
-                const value = answers[Object.keys(answers)[index]];
-                const width = (value/100)*50
-                bar.style.width = Math.abs(width) + "%";
-            });
-        
-            document.getElementById("spinner").style.display = "none";
-        }, 1000); // Slight delay to ensure the DOM is fully updated
+ setTimeout(() => {
+    // Update bar widths
+    const bars = document.querySelectorAll('.bar div');
+    bars.forEach((bar, index) => {
+        const value = answers[Object.keys(answers)[index]];
+        const width = (value / 100) * 50;
+        bar.style.width = Math.abs(width) + "%"; // Set bar width based on the answers
+    });
+
+    // Hide the spinner and show the feedback and chart containers
+    document.getElementById("spinner").style.display = "none";
+    document.querySelector('.feedback-container').style.display = 'block';
+    document.querySelector('.chart-container').style.display = 'block';
+
+    // Auto-scroll to the bottom of the page after the elements are shown
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight, // Scroll to the end of the page
+            behavior: 'smooth' // Add smooth scrolling
+        });
+    }, 100); // A small delay to ensure the DOM is fully updated and visible
+
+}, 3000); // Slight delay to ensure the DOM is fully updated
+
 })       
     }
-
 
 
 

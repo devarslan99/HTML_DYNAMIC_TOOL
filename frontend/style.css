@@ -137,7 +137,7 @@ th,
 td {
   text-align: center;
   padding: 10px;
-  width: auto;
+  /* width: auto; */
 
 }
 
@@ -176,21 +176,12 @@ td label {
   color: #666;
 }
 
-/* .radioDiv{
+.radioDiv{
   display: flex;
   flex-direction: column;
-  height: 60px;
-} */
-.radioDiv {
-  display: flex;
-  justify-content: space-evenly;
-  flex-direction: column;
-  /* Ensures equal spacing between the radio buttons */
-  align-items: center;
-  width: 100%;
-  /* Ensures full width */
   height: 60px;
 }
+
 
 .radioDiv span {
   margin-top: 5px;
@@ -201,7 +192,7 @@ td label {
 
 input[type="radio"] {
   transform: scale(1.2);
-  margin-right: 10px;
+
 }
 
 /* Hover and focus states */
@@ -254,6 +245,7 @@ button:active {
 /* Styling for the score section */
 .score {
   font-family: 'Arial', sans-serif;
+  font-weight: bold;
   font-size: 1.2rem;
   color: #333;
   margin: 20px 0;
@@ -262,8 +254,7 @@ button:active {
 
 .score span {
   font-weight: bold;
-  color: #007bff;
-  /* Blue color for score number */
+  color: #333;
 }
 
 /* Feedback section */
@@ -305,7 +296,7 @@ button:active {
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 30px;
+  padding: 150px 30px;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
@@ -386,25 +377,7 @@ button:active {
   font-weight: bold;
 }
 
-/* .bar div {
-  height: 100%;
-  transition: width 3s cubic-bezier(0.42, 0, 0.58, 1);
-  position: absolute;
-  bottom: 0;
-  border-radius: 12px;
-}
 
-.bar .green {
-  background-color: #28a745; 
-  width: 0; 
-  transition: width 3s cubic-bezier(0.42, 0, 0.58, 1);
-}
-
-.bar .red {
-  background-color: #dc3545; 
-  width: 0; 
-  transition: width 3s cubic-bezier(0.42, 0, 0.58, 1);
-} */
 
 .axis {
   display: flex;
@@ -495,7 +468,130 @@ button:active {
 .right-span {
   text-align: end;
 }
+.radio-value-1,
+.radio-value-2,
+.radio-value-3,
+.radio-value-4,
+.radio-value-5,
+.radio-value-6 ,
+.radio-value-7
+{
+  margin-top: 0px;
+}
+.radio-value-1 span,
+.radio-value-2 span,
+.radio-value-3 span,
+.radio-value-4 span,
+.radio-value-5 span,
+.radio-value-6 span,
+.radio-value-7 span {
+  margin-top: 5px
+}
 
+.radio-value-5 {
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-5 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+}
+.radio-value-3 {
+
+  margin-left:15px !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-3 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.radio-value-1 {
+
+  margin-left: 0 !important;
+  margin-right: 10px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-1 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.radio-value-4 {
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0px !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-4 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.radio-value-5 {
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0px !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-5 span {
+  margin-left: 0 !important;
+  margin-right: 5px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.radio-value-6 {
+  
+  margin-left: 10px !important;
+  margin-right: 15px !important;
+  padding-left: 0px !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-6 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+.radio-value-7 {
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0px !important;
+  padding-right: 0 !important;
+}
+
+/* Forcefully apply to the span inside the div */
+.radio-value-7 span {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 .center-span.vertical-line {
   text-align: center;
   border-left: 2px solid #d3d3d3;
