@@ -51,9 +51,31 @@
         Generate PDF
       </button>
     </div>
-
+    <section class="spinner-container" id="spinner" style="display: none">
+      <div class="spinnerText">
+        <p>Analyzing Data</p>
+        <div class="dots" >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div class="spinner">
+        <div></div>
+      </div>
+    </section>
+    <!-- <section class="feedback-container"> -->
     <section class="feedback-container" style="display: none">
-      <p class="score">On a scale from 0 to 10, <span id="score"></span></p>
+      <div class="infoLineFeedBackContainer">
+
+        <p class="score">On a scale from 0 to 10, The provider's overall testimonial readiness score is <span id="score">
+          <div class="dots" id="dot" >
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </span></p>
+      </div>
       <div id="feedbackBox">
         <div class="feedback">
           <p><strong>Strengths:</strong></p>
@@ -64,12 +86,8 @@
       </div>
     </section>
 
-    <section class="spinner-container" id="spinner" style="display: none">
-      <div class="spinner">
-        <div></div>
-      </div>
-    </section>
 
+    <!-- <section class="chart-container" id="chartContainer"> -->
     <section class="chart-container" id="chartContainer" style="display: none">
       <div class="bar-chart" id="barChart">
         <div class="axis top">

@@ -1,3 +1,4 @@
+import { BASE_URL } from "./config.js";
 import { generatePDF } from "./generatePDF.js";
 
 //
@@ -27,7 +28,7 @@ let newData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch data from the server
-    fetch('https://html-dynamic-tool.vercel.app/api/data', {
+    fetch(`${BASE_URL}/api/data`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -115,21 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             form.innerHTML += questionHTML;
         });
-// document.getElementById('generatePDFButton').addEventListener('click',generatePDF);
-// document.getElementById('submitButton').addEventListener('click', function(event) {
-//     // Prevent the default form submission
-//     event.preventDefault();
-//     // Call the function to calculate score
-//     calculateScore();
-//       const spinnerElement = document.getElementById("spinner");
-//     const elementPosition = spinnerElement.getBoundingClientRect().top + window.scrollY;
-
-//     window.scrollTo({
-//         top: elementPosition,
-//         behavior: 'smooth' // This adds a smooth scrolling effect
-//     });
-// });
-// // document.getElementById('submitButton').addEventListener('click', calculateScore);
 
 document.getElementById('submitButton').addEventListener('click', (event) => {
     event.preventDefault(); // Prevent default form submission
@@ -141,11 +127,11 @@ document.getElementById('submitButton').addEventListener('click', (event) => {
     const formValid = validateForm(); 
 
     // Check if form is valid
-    if (!formValid) {
-        const unansweredQuestions = getUnansweredQuestions();
-        alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
-        return; // Stop further execution if the form is invalid
-    }
+    // if (!formValid) {
+    //     const unansweredQuestions = getUnansweredQuestions();
+    //     alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
+    //     return; // Stop further execution if the form is invalid
+    // }
       // Check if both identifiers are filled
   
 
@@ -211,15 +197,18 @@ document.getElementById('identifier').addEventListener('click', function() {
 
 function calculateScore() {
     const spinnerElement = document.getElementById("spinner");
-
-
+    
+    document.querySelector('.feedback-container').style.display = 'block';
+    
     // Display the spinner
     spinnerElement.style.display = "block"; // Ensure the spinner is shown
-   
+    
     // Hide the chart and feedback containers initially
     document.getElementById("chartContainer").style.display = "none"; 
-    document.querySelector('.feedback-container').style.display = 'none';
-    
+    document.getElementById("score").innerHTML=''
+    document.getElementById("dot").style.display = `inline`;
+    document.getElementById("strengths").innerText = '';
+    document.getElementById("weaknesses").innerText = '';
     setTimeout(() => {
 
   let score =50;
@@ -242,7 +231,7 @@ function calculateScore() {
 
         // Final score adjustment to be between 0 and 10
         score = (Math.max(0, Math.min(100, score)).toFixed(1)/10).toFixed(1);
-        document.getElementById("score").innerHTML = `The provider's overall testimonial readiness score is <span style="color: red; font-weight: bold; border-bottom: 3px solid red;">${score}</span>`;
+        // document.getElementById("score").innerHTML = `<span style="color: red; font-weight: bold; border-bottom: 3px solid red;">${score}</span>`;
 
 
    // Determine strengths and weaknesses
@@ -260,8 +249,7 @@ function calculateScore() {
             return `${question}: ${AnswerText[Math.round((answers[key] / 33.33) + 4)]}`;  // Correction: Ensured rounding works properly
         });
 
-        document.getElementById("strengths").innerText = strengths.join('\n');
-        document.getElementById("weaknesses").innerText = weaknesses.join('\n');
+       
         //  document.getElementById("feedback-container").style.display = 'block';
 
         // Display bar chart
@@ -380,32 +368,35 @@ function calculateScore() {
         });
         
         // Trigger the animation by setting the width after rendering
- setTimeout(() => {
-    // Update bar widths
-    const bars = document.querySelectorAll('.bar div');
-    bars.forEach((bar, index) => {
-        const value = answers[Object.keys(answers)[index]];
-        const width = (value / 100) * 50;
-        bar.style.width = Math.abs(width) + "%"; // Set bar width based on the answers
-    });
-
-    // Hide the spinner and show the feedback and chart containers
-    document.getElementById("spinner").style.display = "none";
+        document.querySelector('.chart-container').style.display = 'block';
+        setTimeout(() => {
+            // Update bar widths
+            const bars = document.querySelectorAll('.bar div');
+            bars.forEach((bar, index) => {
+                const value = answers[Object.keys(answers)[index]];
+                const width = (value / 100) * 50;
+                bar.style.width = Math.abs(width) + "%"; // Set bar width based on the answers
+            });
+            document.getElementById("strengths").innerText = strengths.join('\n');
+            document.getElementById("weaknesses").innerText = weaknesses.join('\n');
+            // Hide the spinner and show the feedback and chart containers
     document.querySelector('.feedback-container').style.display = 'block';
-    document.querySelector('.chart-container').style.display = 'block';
+    document.getElementById("spinner").style.display = "none";
+    document.getElementById("score").innerHTML = `<span style="color: red; font-weight: bold; border-bottom: 3px solid red;">${score}</span>`;
+    document.getElementById("dot").style.display = `none`;
 
-    // Auto-scroll to the bottom of the page after the elements are shown
     setTimeout(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight, // Scroll to the end of the page
-            behavior: 'smooth' // Add smooth scrolling
-        });
+        const charContainer = document.querySelector('.chart-container'); // Select the .char-container element
+        if (charContainer) {
+            charContainer.scrollIntoView({
+                behavior: 'smooth' // Smooth scrolling
+            });
+        }
     }, 100); // A small delay to ensure the DOM is fully updated and visible
 
 }, 3000); // Slight delay to ensure the DOM is fully updated
 
-})       
-    }
+})}
 
 
 
