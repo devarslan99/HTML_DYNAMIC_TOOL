@@ -127,11 +127,11 @@ document.getElementById('submitButton').addEventListener('click', (event) => {
     const formValid = validateForm(); 
 
     // Check if form is valid
-    // if (!formValid) {
-    //     const unansweredQuestions = getUnansweredQuestions();
-    //     alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
-    //     return; // Stop further execution if the form is invalid
-    // }
+    if (!formValid) {
+        const unansweredQuestions = getUnansweredQuestions();
+        alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
+        return; // Stop further execution if the form is invalid
+    }
     //   Check if both identifiers are filled
   
 console.log( document.getElementsByClassName('generatePDFButton'));
