@@ -411,14 +411,6 @@ function calculateScore() {
     document.getElementById("score").innerHTML = `<span style="color: red; font-weight: bold; border-bottom: 3px solid red;">${score}</span>`;
     document.getElementById("dot").style.display = `none`;
 
-    setTimeout(() => {
-        const charContainer = document.querySelector('.chart-container'); // Select the .char-container element
-        if (charContainer) {
-            charContainer.scrollIntoView({
-                behavior: 'smooth' // Smooth scrolling
-            });
-        }
-    }, 100); // A small delay to ensure the DOM is fully updated and visible
 
 }, 3000); // Slight delay to ensure the DOM is fully updated
 
