@@ -3,9 +3,10 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import Question from './questionModel.js'; // Importing the Mongoose model
-
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 app.use(cors({
     origin: '*', // Allows all origins
@@ -16,7 +17,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://saadumer5476:aaSSddFF%40123%23@html.uewjc.mongodb.net/?retryWrites=true&w=majority&appName=html').then(() => {
+mongoose.connect(process.env.MONGODB_URL).then(() => {
     console.log('Connected to MongoDB');
     // Add predefined questions after successful connection
     // addPredefinedQuestions();

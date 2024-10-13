@@ -127,33 +127,53 @@ document.getElementById('submitButton').addEventListener('click', (event) => {
     const formValid = validateForm(); 
 
     // Check if form is valid
-    if (!formValid) {
-        const unansweredQuestions = getUnansweredQuestions();
-        alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
-        return; // Stop further execution if the form is invalid
-    }
+    // if (!formValid) {
+    //     const unansweredQuestions = getUnansweredQuestions();
+    //     alert("Please provide an answer to the following questions: " + unansweredQuestions.join(", "));
+    //     return; // Stop further execution if the form is invalid
+    // }
     //   Check if both identifiers are filled
   
-
+console.log( document.getElementsByClassName('generatePDFButton'));
     // If both identifiers are filled and form is valid, calculate score
    calculateScore();
-       const spinnerElement = document.getElementById("spinner");
+   const spinnerElement = document.getElementById("spinner");
+
+// Show the spinner first (assuming it's hidden by default)
+spinnerElement.style.display = "block";
+
+// Use setTimeout to allow rendering before scrolling
+setTimeout(() => {
     const elementPosition = spinnerElement.getBoundingClientRect().top + window.scrollY;
 
     window.scrollTo({
         top: elementPosition,
-        behavior: 'smooth' // This adds a smooth scrolling effect
+        behavior: 'smooth'
     });
+}, 100); 
 
       setTimeout(() => {
-        document.getElementById('generatePDFButton').style.display = 'inline-block';
-    }, 3000); // Delay of 2000ms (2 seconds)
+        // document.getElementsByClassName('generatePDFButton').style.display = 'inline-block';
+        const buttons = document.getElementsByClassName('generatePDFButton');
+
+        // Loop through each button and set the display style
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].style.display = 'inline-block';
+        }
+    }, 3100); // Delay of 2000ms (3.1 seconds)
+
 });
 
-document.getElementById('generatePDFButton').addEventListener('click', generatePDF);
+// document.getElementsByClassName('generatePDFButton').addEventListener('click', generatePDF);
+const buttons = document.getElementsByClassName('generatePDFButton');
+
+// Loop through each button and attach the event listener
+for (let i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', generatePDF);
+}
 
     })
-    
+
     .catch(error => console.error('Error fetching data:', error));
 });
 
@@ -197,6 +217,7 @@ document.getElementById('identifier').addEventListener('click', function() {
 
 function calculateScore() {
     const spinnerElement = document.getElementById("spinner");
+    
     
     document.querySelector('.feedback-container').style.display = 'block';
     
@@ -367,6 +388,11 @@ function calculateScore() {
             barChart.innerHTML += bar;
         });
         
+        barChart.innerHTML+=`   <button class="generatePDFButton" type="button" style="display: none">
+        Generate PDF
+      </button>`
+
+    
         // Trigger the animation by setting the width after rendering
         document.querySelector('.chart-container').style.display = 'block';
         setTimeout(() => {
@@ -395,6 +421,8 @@ function calculateScore() {
     }, 100); // A small delay to ensure the DOM is fully updated and visible
 
 }, 3000); // Slight delay to ensure the DOM is fully updated
+
+
 
 })}
 
