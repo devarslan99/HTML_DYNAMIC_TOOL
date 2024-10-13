@@ -160,17 +160,16 @@ setTimeout(() => {
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].style.display = 'inline-block';
         }
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', generatePDF);
+        }
     }, 3100); // Delay of 2000ms (3.1 seconds)
 
 });
 
-// document.getElementsByClassName('generatePDFButton').addEventListener('click', generatePDF);
-const buttons = document.getElementsByClassName('generatePDFButton');
 
 // Loop through each button and attach the event listener
-for (let i = 0; i < buttons.length; i++) {
-    buttons[i].addEventListener('click', generatePDF);
-}
+
 
     })
 
